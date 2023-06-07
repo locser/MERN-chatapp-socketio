@@ -5,7 +5,6 @@ import { VStack } from '@chakra-ui/layout';
 import { useToast } from '@chakra-ui/toast';
 import axios from 'axios';
 import { useState } from 'react';
-import { useHistory } from 'react-router';
 
 export const SignUp = () => {
   const [show, setShow] = useState(false);
@@ -14,6 +13,7 @@ export const SignUp = () => {
   const [password, setPassword] = useState();
   const [passwordConfirm, setPasswordConfirm] = useState();
   const [pic, setPic] = useState();
+  const [imageUrlBlob, setImageUrlBlob] = useState('');
   const [picLoading, setPicLoading] = useState();
   const toast = useToast();
 
@@ -25,30 +25,42 @@ export const SignUp = () => {
     setPicLoading(true);
     console.log(pic);
 
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const imageUrl = reader.result;
-      console.log(imageUrl); // Đường dẫn của ảnh được chọn
-      // Tiếp tục xử lý logic với đường dẫn ảnh
-    };
-
-    reader.readAsDataURL(pic);
-
     if (!pic) {
-      toast({
-        title: 'Please Select an Image!',
-        status: 'warning',
-        duration: 5000,
-        isClosable: true,
-        position: 'top',
-      });
+      // toast({
+      //   title: 'Please Select an Image!',
+      //   status: 'warning',
+      //   duration: 5000,
+      //   isClosable: true,
+      //   position: 'top',
+      // });
       localStorage.removeItem('temporaryPic');
+      setPicLoading(false);
       return;
     }
 
+    // lấy, xử lý đường dẫn ảnh với blob
+    const file = pic;
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const imagePath = e.target.result;
+      console.log(imagePath); // Đường dẫn ảnh sẽ được in ra console
+
+      fetch(imagePath)
+        .then((response) => response.blob())
+        .then((blob) => {
+          const imageUrl = URL.createObjectURL(blob);
+          this.setState({ imageSrc: imageUrl });
+        })
+
+        .catch((error) => {
+          console.error('Lỗi:', error);
+        });
+    };
+    // console.log(localStorage.getItem('tempImageUrlBlob'));
+    console.log(this.state.imageSrc);
     if (pic.type === 'image/jpeg' || pic.type === 'image/png') {
-      localStorage.setItem('temporaryPic', JSON.stringify(pic));
+      // localStorage.setItem('temporaryPic', JSON.stringify(pic));
     }
     setPicLoading(false);
   };
@@ -219,3 +231,42 @@ export const SignUp = () => {
 //     // ...
 //   }
 // };
+
+// class ImageUploader extends React.Component {
+//   handleImageChange = (event) => {
+//     const file = event.target.files[0];
+//     const reader = new FileReader();
+
+//     reader.onload = (e) => {
+//       const imagePath = e.target.result;
+//       console.log(imagePath); // Đường dẫn ảnh sẽ được in ra console
+
+//       fetch(imagePath)
+//         .then(response => response.blob())
+//         .then(blob => {
+//           const imageUrl = URL.createObjectURL(blob);
+//           this.setState({ imageSrc: imageUrl });
+//         })
+//         .catch(error => {
+//           console.error('Lỗi:', error);
+//         });
+//     };
+
+//     reader.readAsDataURL(file);
+//   };
+
+//   render() {
+//     return (
+//       <div>
+//         <input
+//           type="file"
+//           id="image-input"
+//           onChange={this.handleImageChange}
+//         />
+//         <img src={this.state.imageSrc} alt="Uploaded Image" />
+//       </div>
+//     );
+//   }
+// }
+
+// export default ImageUploader;
