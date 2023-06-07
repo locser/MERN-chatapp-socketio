@@ -24,17 +24,6 @@ export const SignUp = () => {
     // Create loading animation
     setPicLoading(true);
     console.log(pic);
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const imageUrl = reader.result;
-      console.log(imageUrl); // Đường dẫn của ảnh được chọn
-      // Tiếp tục xử lý logic với đường dẫn ảnh
-    };
-
-    reader.readAsDataURL(pic);
-
     if (!pic) {
       toast({
         title: 'Please Select an Image!',
@@ -64,6 +53,29 @@ export const SignUp = () => {
       // upload image to Cloudinary and get image information
     }
     //The backend handles user registration
+  };
+
+ const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+  
+    reader.onload = (e) => {
+      const imagePath = e.target.result;
+      console.log(imagePath); // Đường dẫn ảnh sẽ được in ra console
+  
+      fetch(imagePath)
+        .then(response => response.blob())
+        .then(blob => {
+          const imageUrl = URL.createObjectURL(blob);
+          console.log(imageUrl)
+          // this.setState({ imageUrl }); // Set giá trị mới cho imageUrl trong state
+        })
+        .catch(error => {
+          console.error('Lỗi:', error);
+        });
+    };
+  
+    reader.readAsDataURL(file);
   };
 
   return (
@@ -130,7 +142,7 @@ export const SignUp = () => {
           type="file"
           p={1.5}
           accept="image/*"
-          onChange={(e) => postDetails(e.target.files[0])}
+          onChange={handleImageChange}
         />
       </FormControl>
 
