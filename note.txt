@@ -1,0 +1,56 @@
+-- npm init
+     initialize new server
+     {
+        "name": "mern-chatapp-socketio",
+        "version": "1.0.0",
+        "description": "learn MERN with locser",
+        "main": "server.js",
+        "scripts": {
+            "test": "echo \"Error: no test specified\" && exit 1"
+        },
+        "author": "locser",
+        "license": "ISC"
+    }
+- npm install express
+    install express
+- create server.js (/backend/server.js)
+- npm install nodemon
+- npx create-react-app frontend 
+    tạo react app tên frontend
+    Lệnh trên sẽ tạo một ứng dụng React mới với tên my-app, mà không cần cài đặt create-react-app trước đó. npx sẽ tự động tải gói create-react-app từ npm, thực thi nó và sau đó xóa gói đó khỏi hệ thống của bạn.
+
+    Lợi ích của việc sử dụng npx là bạn không cần phải quản lý các gói cục bộ và không gây xung đột giữa các phiên bản của các gói khác nhau. Nó cũng cho phép bạn chạy các phiên bản mới nhất của các gói mà không cần cập nhật thủ công.
+
+- cd frontend 
+- npm start
+      Local:            http://localhost:3000
+
+- chakra ui
+- add proxy server http://127.0.0.1:3002
+
+-npm i axios
+
+-- //TODO: asyncHandler
+
+- npm i bcrypt
+- npm uninstall bcrypt
+- npm i bcryptjs
+- npm i jsonwebtoken
+
+- //TODO: 
+
+    //FIXME: Cloudinary là một dịch vụ quản lý hình ảnh và video dựa trên đám mây. Nó cung cấp các tính năng mạnh mẽ để tải lên, lưu trữ, xử lý và phục vụ hình ảnh và video trên ứng dụng web và di động.
+
+    Cloudinary giúp đơn giản hóa việc quản lý tài nguyên đa phương tiện bằng cách cung cấp các API dễ sử dụng và các tính năng như xử lý hình ảnh (cắt, điều chỉnh kích thước, xoay, làm mờ, v.v.), xử lý video (cắt, nén, chuyển đổi định dạng, v.v.), tạo các phiên bản hình ảnh với chất lượng và kích thước khác nhau, tự động tạo ảnh xác định môi trường (responsive), giao diện phục vụ tối ưu tốc độ, và nhiều tính năng khác.
+
+    Với Cloudinary, bạn có thể tải lên các tệp hình ảnh và video từ máy chủ hoặc từ các nguồn khác như URL hoặc thiết bị người dùng, lưu trữ an toàn và quản lý các tệp đó trên đám mây. Bạn cũng có thể tích hợp Cloudinary vào ứng dụng web hoặc di động của mình để hiển thị và phục vụ hình ảnh và video cho người dùng.
+
+    Cloudinary cung cấp cả phiên bản miễn phí và phiên bản trả phí với các gói dịch vụ mở rộng và tính năng cao cấp.
+
+    Sử dụng Cloudinary, bạn có thể giảm thiểu công việc phát triển, tăng tốc độ tải trang, tiết kiệm không gian lưu trữ và tăng trải nghiệm người dùng khi làm việc với hình ảnh và video trên ứng dụng của mình.
+
+-  đăng nhập Cloudinary, cài đặt vào cài đặt -  account -  edit product         enviroment để biết các thông tin về Cloud.
+    lấy API URL 
+
+- npm install cloudinary
+
