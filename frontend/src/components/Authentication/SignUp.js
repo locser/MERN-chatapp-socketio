@@ -3,7 +3,7 @@ import { FormControl, FormLabel } from '@chakra-ui/form-control';
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/input';
 import { VStack } from '@chakra-ui/layout';
 import { useToast } from '@chakra-ui/toast';
-import axios from 'axios';
+// import axios from 'axios';
 import { useState } from 'react';
 
 export const SignUp = () => {
@@ -18,51 +18,49 @@ export const SignUp = () => {
   const toast = useToast();
 
   const handleClickPassword = () => setShow(!show);
+
+  //TODO: get image url,  -> blob url
   //postDetails should only upload an image and temporarily save it to localstorage, when you click register, you will upload
   //  that image to the cloudinary, and receive the data then register the user
   const postDetails = async (pic) => {
-    // Create loading animation
-    setPicLoading(true);
-    console.log(pic);
+    // console.log(pic);
 
     if (!pic) {
-      // toast({
-      //   title: 'Please Select an Image!',
-      //   status: 'warning',
-      //   duration: 5000,
-      //   isClosable: true,
-      //   position: 'top',
-      // });
-      localStorage.removeItem('temporaryPic');
       setPicLoading(false);
+      setImageUrlBlob('');
       return;
+    } else {
+      // lấy, xử lý đường dẫn ảnh với blob
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        const imagePath = e.target.result;
+        // console.log('imagePath------', imagePath);
+        // in Đường dẫn ảnh
+
+        fetch(imagePath)
+          .then((response) => response.blob())
+          .then((blob) => {
+            const imageUrl = URL.createObjectURL(blob);
+            console.log(imageUrl); // in Đường dẫn imageUrl
+            setImageUrlBlob(imageUrl);
+          })
+          .catch((error) => {
+            console.error('Lỗi: ', error);
+          });
+      };
+
+      reader.readAsDataURL(pic);
     }
 
-    // lấy, xử lý đường dẫn ảnh với blob
-    const file = pic;
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      const imagePath = e.target.result;
-      console.log(imagePath); // Đường dẫn ảnh sẽ được in ra console
-
-      fetch(imagePath)
-        .then((response) => response.blob())
-        .then((blob) => {
-          const imageUrl = URL.createObjectURL(blob);
-          this.setState({ imageSrc: imageUrl });
-        })
-
-        .catch((error) => {
-          console.error('Lỗi:', error);
-        });
-    };
-    // console.log(localStorage.getItem('tempImageUrlBlob'));
-    console.log(this.state.imageSrc);
-    if (pic.type === 'image/jpeg' || pic.type === 'image/png') {
-      // localStorage.setItem('temporaryPic', JSON.stringify(pic));
-    }
+    // TODO: wait 3s
     setPicLoading(false);
+  };
+
+  const handleInputChange = (e) => {
+    const selectedPic = e.target.files[0];
+    setPic(selectedPic);
+    postDetails(selectedPic);
   };
 
   //when i click Sign up button
@@ -138,13 +136,13 @@ export const SignUp = () => {
       <FormControl id="pic">
         <FormLabel>Upload your Picture</FormLabel>
         <Input
-          value={pic}
           type="file"
           p={1.5}
           accept="image/*"
-          onChange={(e) => postDetails(e.target.files[0])}
+          onChange={handleInputChange}
         />
       </FormControl>
+      {<img src={imageUrlBlob} alt="Uploaded Image" />}
 
       <Button
         colorScheme="blue"
@@ -270,3 +268,11 @@ export const SignUp = () => {
 // }
 
 // export default ImageUploader;
+
+// toast({
+//   title: 'Please Select an Image!',
+//   status: 'warning',
+//   duration: 5000,
+//   isClosable: true,
+//   position: 'top',
+// });
