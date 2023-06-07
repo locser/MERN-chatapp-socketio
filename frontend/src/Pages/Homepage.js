@@ -17,32 +17,24 @@ export const Homepage = () => {
         w="100%"
         m="40px 0 15px 0"
         borderRadius="lg"
-        borderWith="1px"
       >
         <Text fontSize="4xl" fontFamily="Work sans" color="black">
           Talk A Tive
         </Text>
       </Box>
-      <Box
-        p={4}
-        bg={'white'}
-        w="100%"
-        borderRadius="lg"
-        color="black"
-        borderWith="1px"
-      >
+      <Box p={4} bg={'white'} w="100%" borderRadius="lg" color="black">
         <Tabs variant="soft-rounded" colorScheme="green">
           <TabList>
-            <Tab width="50%">Login</Tab>
             <Tab width="50%">Sign Up</Tab>
+            <Tab width="50%">Login</Tab>
           </TabList>
 
           <TabPanels>
             <TabPanel>
-              <Login />
+              <SignUp />
             </TabPanel>
             <TabPanel>
-              <SignUp />
+              <Login />
             </TabPanel>
           </TabPanels>
         </Tabs>
