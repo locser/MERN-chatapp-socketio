@@ -4,10 +4,12 @@ const dotenv = require('dotenv');
 const colors = require('colors');
 const userRoutes = require('./routes/userRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+const cors = require('cors');
 
 dotenv.config({ path: 'config.env' });
 
 const app = express();
+app.use(cors());
 
 const PORT = process.env.PORT || 3002;
 

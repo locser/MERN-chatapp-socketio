@@ -26,7 +26,7 @@
       Local:            http://localhost:3000
 
 - chakra ui
-- add proxy server http://127.0.0.1:3002
+- add proxy server http://127.0.0.1:3001
 
 -npm i axios
 
@@ -53,4 +53,4 @@
     lấy API URL 
 
 - npm install cloudinary
-
+- npm install cors

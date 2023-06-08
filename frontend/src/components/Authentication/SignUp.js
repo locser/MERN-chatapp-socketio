@@ -3,7 +3,7 @@ import { FormControl, FormLabel } from '@chakra-ui/form-control';
 import { Input, InputGroup, InputRightElement } from '@chakra-ui/input';
 import { VStack } from '@chakra-ui/layout';
 import { useToast } from '@chakra-ui/toast';
-// import axios from 'axios';
+import axios from 'axios';
 import { useState } from 'react';
 
 export const SignUp = () => {
@@ -13,67 +13,106 @@ export const SignUp = () => {
   const [password, setPassword] = useState();
   const [passwordConfirm, setPasswordConfirm] = useState();
   const [pic, setPic] = useState();
-  const [imageUrlBlob, setImageUrlBlob] = useState('');
+  // const [imageUrlBlob, setImageUrlBlob] = useState('');
   const [picLoading, setPicLoading] = useState();
   const toast = useToast();
 
   const handleClickPassword = () => setShow(!show);
 
-  //TODO: get image url,  -> blob url
-  //postDetails should only upload an image and temporarily save it to localstorage, when you click register, you will upload
-  //  that image to the cloudinary, and receive the data then register the user
-  const postDetails = async (pic) => {
-    // console.log(pic);
+  // const postDetails = async (pic) => {
+  //   // console.log(pic);
 
-    if (!pic) {
-      setPicLoading(false);
-      setImageUrlBlob('');
-      return;
+  //   if (!pic) {
+  //     setPicLoading(false);
+  //     setPic(null);
+  //     return;
+  //   } else {
+  //   }
+
+  //   // wait 3s
+  //   setPicLoading(false);
+  // };
+
+  //reset pic when user pick another image
+  const handleInputChange = (e) => {
+    setPicLoading(true);
+    const selectedPic = e.target.files[0];
+    if (!selectedPic) {
+      setPic(null);
     } else {
-      // lấy, xử lý đường dẫn ảnh với blob
-      const reader = new FileReader();
-
-      reader.onload = (e) => {
-        const imagePath = e.target.result;
-        // console.log('imagePath------', imagePath);
-        // in Đường dẫn ảnh
-
-        fetch(imagePath)
-          .then((response) => response.blob())
-          .then((blob) => {
-            const imageUrl = URL.createObjectURL(blob);
-            console.log(imageUrl); // in Đường dẫn imageUrl
-            setImageUrlBlob(imageUrl);
-          })
-          .catch((error) => {
-            console.error('Lỗi: ', error);
-          });
-      };
-
-      reader.readAsDataURL(pic);
+      setPic(selectedPic);
     }
-
-    // TODO: wait 3s
+    // postDetails(selectedPic);
+    // wait 3s
     setPicLoading(false);
   };
 
-  const handleInputChange = (e) => {
-    const selectedPic = e.target.files[0];
-    setPic(selectedPic);
-    postDetails(selectedPic);
+  const submitHandler = (e) => {
+    signUpHandler(pic);
   };
-
-  //when i click Sign up button
-  const submitHandler = () => {
+  //when i click Sign up button, Push data to the backend and process it
+  const signUpHandler = async (image) => {
     //create loading animation
     setPicLoading(true);
 
-    // check image if user dont select image, localStorage null
-    if (!localStorage.getItem('temporaryPic')) {
-    } else {
-      // upload image to Cloudinary and get image information
+    if (!name || !email || !password || !passwordConfirm) {
+      toast({
+        title: 'Please fill all the fields!',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+        position: 'top',
+      });
+      // setTimeout(3000);  set time out avoid spamming the click event
+      setPicLoading(false);
+      return;
     }
-    //The backend handles user registration
+
+    if (password !== passwordConfirm) {
+      toast({
+        title: 'Passwords do not match!',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+        position: 'top',
+      });
+      // setTimeout(3000); set time out avoid spamming the click event
+      setPicLoading(false);
+      return;
+    }
+
+    try {
+      // Gửi dữ liệu lên backend
+      //http://localhost:3001/api/user/uploadAvatar route backend server
+      // Access to XMLHttpRequest at 'http://localhost:3001/user/uploadAvatar' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+      // FIXME: use CORS to fix
+      // get Pic
+      let imgAvatar = '';
+      if (pic !== null) {
+        const formData = new FormData();
+        formData.append('image', image);
+        console.log(formData.get('image'));
+
+        const response = await axios.post(
+          'http://127.0.0.1:3001/api/user/uploadAvatar',
+          formData
+        );
+        imgAvatar = response.data.data;
+        console.log(response);
+      }
+
+      //sign up -  call backend: router.route('/').post(registerUser);
+      console.log(name, email, password, imgAvatar);
+
+      //config headers
+      // const
+
+      setPicLoading(false);
+    } catch (error) {
+      setPicLoading(false);
+      console.log(error);
+    }
+    setPicLoading(false);
   };
 
   return (
@@ -121,7 +160,7 @@ export const SignUp = () => {
           <Input
             value={passwordConfirm}
             type={show ? 'text' : 'password'}
-            placeholder="Enter your password"
+            placeholder="Confirm password"
             onChange={(e) => setPasswordConfirm(e.target.value)}
           />
 
@@ -142,7 +181,7 @@ export const SignUp = () => {
           onChange={handleInputChange}
         />
       </FormControl>
-      {<img src={imageUrlBlob} alt="Uploaded Image" />}
+      {/* {imageUrlBlob ? <img src={imageUrlBlob} alt="Uploaded Image" /> : null} */}
 
       <Button
         colorScheme="blue"
@@ -157,118 +196,6 @@ export const SignUp = () => {
   );
 };
 
-// TODO: when click signup get all information and pic, upload image to cloud storage
-// const postDetails = (pics) => {
-//   setLoading(true);
-//   // if (pics === undefined) {
-//   if (!pics) {
-//     toast({
-//       title: 'Please select an Image!',
-//       status: 'Warning',
-//       duration: 5000,
-//       isClosable: true,
-//       position: 'top',
-//     });
-
-//     return;
-//   }
-
-//   if (pic.type === 'image/jpeg' || pic.type === 'image/png') {
-//     const dataPic = new FormData();
-//     dataPic.append('file', pics);
-//     dataPic.append('upload_preset', 'chat-app');
-//     dataPic.append('cloud_name', 'cloudianry-chat-app');
-
-//     // fetch('https://api.cloudinary.com/v1_1/cloudianry-chat-app')
-//     // TODO:  gọi hàm upload Image từ backend. axios
-//   }
-// };
-
-// const postDetails = async (pic) => {
-//   setLoading(true);
-//   //check image
-//   if (!pic) {
-//     toast({
-//       title: 'Please select an Image!',
-//       status: 'warning',
-//       duration: 5000,
-//       isClosable: true,
-//       position: 'top',
-//     });
-//     return;
-//   }
-
-//   // Lưu trữ tạm thời hình ảnh vào localStorage
-//   localStorage.setItem('temporaryPic', JSON.stringify(pic));
-
-//   try {
-//     // Tạo FormData và thêm các dữ liệu cần gửi lên backend
-//     const formData = new FormData();
-//     formData.append('name', name);
-//     formData.append('email', email);
-//     formData.append('password', password);
-//     // Thêm hình ảnh vào FormData
-//     formData.append('pic', pic);
-
-//     // Gửi dữ liệu lên backend
-//     //route register - (router.route('/').post(registerUser);)
-//     const response = await axios.post('/', formData, {
-//       headers: {
-//         'Content-Type': 'multipart/form-data',
-//       },
-//     });
-
-//     // Xử lý response từ backend (nếu cần)
-//     // ...
-
-//     // Xóa hình ảnh tạm thời khỏi localStorage sau khi hoàn thành
-//     localStorage.removeItem('temporaryPic');
-//   } catch (error) {
-//     console.error(error);
-//     // Xử lý lỗi (nếu cần)
-//     // ...
-//   }
-// };
-
-// class ImageUploader extends React.Component {
-//   handleImageChange = (event) => {
-//     const file = event.target.files[0];
-//     const reader = new FileReader();
-
-//     reader.onload = (e) => {
-//       const imagePath = e.target.result;
-//       console.log(imagePath); // Đường dẫn ảnh sẽ được in ra console
-
-//       fetch(imagePath)
-//         .then(response => response.blob())
-//         .then(blob => {
-//           const imageUrl = URL.createObjectURL(blob);
-//           this.setState({ imageSrc: imageUrl });
-//         })
-//         .catch(error => {
-//           console.error('Lỗi:', error);
-//         });
-//     };
-
-//     reader.readAsDataURL(file);
-//   };
-
-//   render() {
-//     return (
-//       <div>
-//         <input
-//           type="file"
-//           id="image-input"
-//           onChange={this.handleImageChange}
-//         />
-//         <img src={this.state.imageSrc} alt="Uploaded Image" />
-//       </div>
-//     );
-//   }
-// }
-
-// export default ImageUploader;
-
 // toast({
 //   title: 'Please Select an Image!',
 //   status: 'warning',
@@ -276,3 +203,39 @@ export const SignUp = () => {
 //   isClosable: true,
 //   position: 'top',
 // });
+
+//get image url,  -> blob url
+//postDetails should only upload an image and temporarily save it to localstorage, when you click register, you will upload
+//  that image to the cloudinary, and receive the data then register the user
+// const postDetails = async (pic) => {
+//   // console.log(pic);
+
+//   if (!pic) {
+//     setPicLoading(false);
+//     setImageUrlBlob('');
+//     return;
+//   } else {
+//     // lấy, xử lý đường dẫn ảnh với blob
+//     const reader = new FileReader();
+//     reader.onload = (e) => {
+//       const imagePath = e.target.result;
+//       // console.log('imagePath------', imagePath);
+//       // in Đường dẫn ảnh
+//       fetch(imagePath)
+//         .then((response) => response.blob())
+//         .then((blob) => {
+//           const imageUrl = URL.createObjectURL(blob);
+//           console.log(imageUrl); // in Đường dẫn imageUrl
+//           setImageUrlBlob(imageUrl);
+//         })
+//         .catch((error) => {
+//           console.error('Lỗi: ', error);
+//         });
+//     };
+//     setTimeout(3000);
+//     reader.readAsDataURL(pic);
+//   }
+
+//   // wait 3s
+//   setPicLoading(false);
+// };
