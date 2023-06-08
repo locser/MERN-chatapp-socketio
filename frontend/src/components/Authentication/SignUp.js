@@ -19,20 +19,6 @@ export const SignUp = () => {
 
   const handleClickPassword = () => setShow(!show);
 
-  // const postDetails = async (pic) => {
-  //   // console.log(pic);
-
-  //   if (!pic) {
-  //     setPicLoading(false);
-  //     setPic(null);
-  //     return;
-  //   } else {
-  //   }
-
-  //   // wait 3s
-  //   setPicLoading(false);
-  // };
-
   //reset pic when user pick another image
   const handleInputChange = (e) => {
     setPicLoading(true);
@@ -103,9 +89,6 @@ export const SignUp = () => {
 
       //sign up -  call backend: router.route('/').post(registerUser);
       console.log(name, email, password, imgAvatar);
-
-      //config headers
-      // const
 
       setPicLoading(false);
     } catch (error) {
@@ -195,47 +178,3 @@ export const SignUp = () => {
     </VStack>
   );
 };
-
-// toast({
-//   title: 'Please Select an Image!',
-//   status: 'warning',
-//   duration: 5000,
-//   isClosable: true,
-//   position: 'top',
-// });
-
-//get image url,  -> blob url
-//postDetails should only upload an image and temporarily save it to localstorage, when you click register, you will upload
-//  that image to the cloudinary, and receive the data then register the user
-// const postDetails = async (pic) => {
-//   // console.log(pic);
-
-//   if (!pic) {
-//     setPicLoading(false);
-//     setImageUrlBlob('');
-//     return;
-//   } else {
-//     // lấy, xử lý đường dẫn ảnh với blob
-//     const reader = new FileReader();
-//     reader.onload = (e) => {
-//       const imagePath = e.target.result;
-//       // console.log('imagePath------', imagePath);
-//       // in Đường dẫn ảnh
-//       fetch(imagePath)
-//         .then((response) => response.blob())
-//         .then((blob) => {
-//           const imageUrl = URL.createObjectURL(blob);
-//           console.log(imageUrl); // in Đường dẫn imageUrl
-//           setImageUrlBlob(imageUrl);
-//         })
-//         .catch((error) => {
-//           console.error('Lỗi: ', error);
-//         });
-//     };
-//     setTimeout(3000);
-//     reader.readAsDataURL(pic);
-//   }
-
-//   // wait 3s
-//   setPicLoading(false);
-// };
