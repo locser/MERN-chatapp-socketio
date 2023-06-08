@@ -1,19 +1,71 @@
-import { FormControl, FormLabel, InputRightElement } from '@chakra-ui/react';
-import React from 'react';
-import { useState } from 'react';
+import { Button } from '@chakra-ui/button';
+import { FormControl, FormLabel } from '@chakra-ui/form-control';
+import { Input, InputGroup, InputRightElement } from '@chakra-ui/input';
 import { VStack } from '@chakra-ui/layout';
-import { Input } from '@chakra-ui/react';
-import { Button } from '@chakra-ui/react';
-import { InputGroup } from '@chakra-ui/react';
+import { useToast } from '@chakra-ui/toast';
+import axios from 'axios';
+import { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 const Login = () => {
   const [show, setShow] = useState(false);
+  const handleClick = () => setShow(!show);
+  const toast = useToast();
   const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+  const [loading, setLoading] = useState(false);
 
-  const handleClickPassword = () => setShow(!show);
+  const history = useHistory();
 
-  const submitHandler = () => {};
+  const submitHandler = async () => {
+    setLoading(true);
+    if (!email || !password) {
+      toast({
+        title: 'Please Fill all the Feilds',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+        position: 'top',
+      });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const config = {
+        headers: {
+          'Content-type': 'application/json',
+        },
+      };
+
+      const { data } = await axios.post(
+        '/api/user/login',
+        { email, password },
+        config
+      );
+
+      toast({
+        title: 'Login Successful',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+        position: 'top',
+      });
+      localStorage.setItem('userInfo', JSON.stringify(data));
+      setLoading(false);
+      history.push('/chats');
+    } catch (error) {
+      toast({
+        title: 'Error Occured!',
+        description: error.response.data.message,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+        position: 'top',
+      });
+      setLoading(false);
+    }
+  };
 
   return (
     <VStack spacing="10px" color="black">
@@ -40,7 +92,7 @@ const Login = () => {
           />
 
           <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={handleClickPassword}>
+            <Button h="1.75rem" size="sm" onClick={handleClick}>
               {show ? 'Hide' : 'Show'}
             </Button>
           </InputRightElement>
@@ -51,6 +103,7 @@ const Login = () => {
         colorScheme="blue"
         width={'100%'}
         style={{ marginTop: 15 }}
+        isLoading={loading}
         onClick={submitHandler}
       >
         Login

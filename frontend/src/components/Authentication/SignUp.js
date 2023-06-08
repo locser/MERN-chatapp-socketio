@@ -5,6 +5,7 @@ import { VStack } from '@chakra-ui/layout';
 import { useToast } from '@chakra-ui/toast';
 import axios from 'axios';
 import { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 export const SignUp = () => {
   const [show, setShow] = useState(false);
@@ -16,6 +17,7 @@ export const SignUp = () => {
   // const [imageUrlBlob, setImageUrlBlob] = useState('');
   const [picLoading, setPicLoading] = useState();
   const toast = useToast();
+  const history = useHistory();
 
   const handleClickPassword = () => setShow(!show);
 
@@ -89,9 +91,46 @@ export const SignUp = () => {
 
       //sign up -  call backend: router.route('/').post(registerUser);
       console.log(name, email, password, imgAvatar);
+      //config headers
+      const configHeaders = {
+        headers: { 'Content-Type': 'application/json' },
+      };
+
+      // vì đã cấu hình proxy server, nên ta không cần ghi lại domain
+      const { data } = await axios.post(
+        '/api/user',
+        {
+          name,
+          email,
+          password,
+          imgAvatar,
+        },
+        configHeaders
+      );
+      console.log(data);
+
+      //if data.status === 'success' -> register user successfully
+      toast({
+        title: 'Registration Successful',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+        position: 'top',
+      });
+      localStorage.setItem('userInfo', JSON.stringify(data));
 
       setPicLoading(false);
+
+      history.push('/chats');
     } catch (error) {
+      toast({
+        title: 'Error Occured!',
+        description: error.response.data.message,
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+        position: 'top',
+      });
       setPicLoading(false);
       console.log(error);
     }
