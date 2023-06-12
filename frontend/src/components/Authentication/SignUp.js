@@ -5,122 +5,60 @@ import { VStack } from '@chakra-ui/layout';
 import { useToast } from '@chakra-ui/toast';
 import axios from 'axios';
 import { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router';
 
-export const SignUp = () => {
+const Signup = () => {
   const [show, setShow] = useState(false);
-  const [name, setName] = useState();
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
-  const [passwordConfirm, setPasswordConfirm] = useState();
-  const [pic, setPic] = useState();
-  // const [imageUrlBlob, setImageUrlBlob] = useState('');
-  const [picLoading, setPicLoading] = useState();
+  const handleClick = () => setShow(!show);
   const toast = useToast();
   const history = useHistory();
 
-  const handleClickPassword = () => setShow(!show);
+  const [name, setName] = useState();
+  const [email, setEmail] = useState();
+  const [confirmpassword, setConfirmpassword] = useState();
+  const [password, setPassword] = useState();
+  const [pic, setPic] = useState();
 
-  //reset pic when user pick another image
-  const handleInputChange = (e) => {
-    setPicLoading(true);
-    const selectedPic = e.target.files[0];
-    if (!selectedPic) {
-      setPic(null);
-    } else {
-      setPic(selectedPic);
-    }
-    // postDetails(selectedPic);
-    // wait 3s
-    setPicLoading(false);
-  };
-
-  const submitHandler = (e) => {
-    signUpHandler(pic);
-  };
-  //when i click Sign up button, Push data to the backend and process it
-  const signUpHandler = async (image) => {
-    //create loading animation
-    setPicLoading(true);
-
-    if (!name || !email || !password || !passwordConfirm) {
+  const submitHandler = async () => {
+    if (!name || !email || !password || !confirmpassword) {
       toast({
-        title: 'Please fill all the fields!',
+        title: 'Please Fill all the Feilds',
         status: 'warning',
         duration: 5000,
         isClosable: true,
-        position: 'top',
+        position: 'bottom',
       });
-      // setTimeout(3000);  set time out avoid spamming the click event
-      setPicLoading(false);
       return;
     }
-
-    if (password !== passwordConfirm) {
+    if (password !== confirmpassword) {
       toast({
-        title: 'Passwords do not match!',
+        title: 'Passwords Do Not Match',
         status: 'warning',
         duration: 5000,
         isClosable: true,
-        position: 'top',
+        position: 'bottom',
       });
-      // setTimeout(3000); set time out avoid spamming the click event
-      setPicLoading(false);
       return;
     }
-
+    console.log(name, email, password, pic);
     try {
-      // Gửi dữ liệu lên backend
-      //http://localhost:3001/api/user/uploadAvatar route backend server
-      // Access to XMLHttpRequest at 'http://localhost:3001/user/uploadAvatar' from origin 'http://localhost:3000' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
-      // FIXME: use CORS to fix
-      // get Pic
-      let imgAvatar = '';
-      if (pic !== null) {
-        const formData = new FormData();
-        formData.append('image', image);
-        console.log(formData.get('image'));
-
-        const response = await axios.post(
-          'http://127.0.0.1:3001/api/user/uploadAvatar',
-          formData
-        );
-        imgAvatar = response.data.data;
-        console.log(response);
-      }
-
-      //sign up -  call backend: router.route('/').post(registerUser);
-      console.log(name, email, password, imgAvatar);
-      //config headers
-      const configHeaders = {
-        headers: { 'Content-Type': 'application/json' },
+      const config = {
+        headers: {
+          'Content-type': 'application/json',
+        },
       };
-
-      // vì đã cấu hình proxy server, nên ta không cần ghi lại domain
       const { data } = await axios.post(
         '/api/user',
         {
           name,
           email,
           password,
-          imgAvatar,
+          pic,
         },
-        configHeaders
+        config
       );
       console.log(data);
-
-      //if data.status === 'success' -> register user successfully
-      toast({
-        title: 'Registration Successful',
-        status: 'success',
-        duration: 5000,
-        isClosable: true,
-        position: 'top',
-      });
       localStorage.setItem('userInfo', JSON.stringify(data));
-
-      setPicLoading(false);
-
       history.push('/chats');
     } catch (error) {
       toast({
@@ -129,91 +67,118 @@ export const SignUp = () => {
         status: 'error',
         duration: 5000,
         isClosable: true,
-        position: 'top',
+        position: 'bottom',
       });
-      setPicLoading(false);
-      console.log(error);
     }
-    setPicLoading(false);
+  };
+
+  const postDetails = (pics) => {
+    if (pics === undefined) {
+      toast({
+        title: 'Please Select an Image!',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+        position: 'bottom',
+      });
+      return;
+    }
+    console.log(pics);
+    if (pics.type === 'image/jpeg' || pics.type === 'image/png') {
+      const data = new FormData();
+      data.append('file', pics);
+      data.append('upload_preset', 'chat-app');
+      data.append('cloud_name', 'piyushproj');
+      fetch('https://api.cloudinary.com/v1_1/piyushproj/image/upload', {
+        method: 'post',
+        body: data,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setPic(data.url.toString());
+          console.log(data.url.toString());
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      toast({
+        title: 'Please Select an Image!',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+        position: 'bottom',
+      });
+      return;
+    }
   };
 
   return (
-    <VStack spacing="5px" color="black">
-      <FormControl id="first-name">
+    <VStack spacing="5px">
+      <FormControl id="first-name" isRequired>
         <FormLabel>Name</FormLabel>
         <Input
-          value={name}
-          placeholder="Enter your name"
+          placeholder="Enter Your Name"
           onChange={(e) => setName(e.target.value)}
         />
       </FormControl>
-
       <FormControl id="email" isRequired>
-        <FormLabel>Email</FormLabel>
+        <FormLabel>Email Address</FormLabel>
         <Input
-          value={email}
-          type=""
-          placeholder="Enter your email"
+          type="email"
+          placeholder="Enter Your Email Address"
           onChange={(e) => setEmail(e.target.value)}
         />
       </FormControl>
-
       <FormControl id="password" isRequired>
         <FormLabel>Password</FormLabel>
-        <InputGroup>
+        <InputGroup size="md">
           <Input
-            value={password}
             type={show ? 'text' : 'password'}
-            placeholder="Enter your password"
+            placeholder="Enter Password"
             onChange={(e) => setPassword(e.target.value)}
           />
-
           <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={handleClickPassword}>
+            <Button h="1.75rem" size="sm" onClick={handleClick}>
               {show ? 'Hide' : 'Show'}
             </Button>
           </InputRightElement>
         </InputGroup>
       </FormControl>
-
-      <FormControl id="passwordConfirm" isRequired>
+      <FormControl id="password" isRequired>
         <FormLabel>Confirm Password</FormLabel>
-        <InputGroup>
+        <InputGroup size="md">
           <Input
-            value={passwordConfirm}
             type={show ? 'text' : 'password'}
             placeholder="Confirm password"
-            onChange={(e) => setPasswordConfirm(e.target.value)}
+            onChange={(e) => setConfirmpassword(e.target.value)}
           />
-
           <InputRightElement width="4.5rem">
-            <Button h="1.75rem" size="sm" onClick={handleClickPassword}>
+            <Button h="1.75rem" size="sm" onClick={handleClick}>
               {show ? 'Hide' : 'Show'}
             </Button>
           </InputRightElement>
         </InputGroup>
       </FormControl>
-
       <FormControl id="pic">
         <FormLabel>Upload your Picture</FormLabel>
         <Input
           type="file"
           p={1.5}
           accept="image/*"
-          onChange={handleInputChange}
+          onChange={(e) => postDetails(e.target.files[0])}
         />
       </FormControl>
-      {/* {imageUrlBlob ? <img src={imageUrlBlob} alt="Uploaded Image" /> : null} */}
-
       <Button
         colorScheme="blue"
-        width={'100%'}
+        width="100%"
         style={{ marginTop: 15 }}
         onClick={submitHandler}
-        isLoading={picLoading}
       >
         Sign Up
       </Button>
     </VStack>
   );
 };
+
+export default Signup;

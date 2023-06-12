@@ -54,3 +54,6 @@
 
 - npm install cloudinary
 - npm install cors
+- npm install @chakra-ui/icons
+- npm install react-notification-badge
+-npm install -g npm-install-peers
