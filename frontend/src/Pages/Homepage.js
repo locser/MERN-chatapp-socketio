@@ -1,12 +1,24 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // import axios from 'axios';
 // import { useEffect } from 'react';
 import { Container, Box, Text } from '@chakra-ui/react';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import Login from '../components/Authentication/Login';
 import { SignUp } from '../components/Authentication/SignUp';
+import { useHistory } from 'react-router';
 
 export const Homepage = () => {
+  const history = useHistory();
+  const [user, setUser] = useState();
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('userInfo'));
+
+    if (!user) {
+      // history.push('/');
+    }
+  }, [history]);
+
   return (
     <Container maxW="xl" centerContent>
       <Box
