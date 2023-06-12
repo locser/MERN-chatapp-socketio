@@ -2,9 +2,10 @@ const express = require('express');
 const connectDB = require('./config/db');
 const dotenv = require('dotenv');
 const colors = require('colors');
-const userRoutes = require('./routes/userRoutes');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const cors = require('cors');
+const userRoutes = require('./routes/userRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 
 dotenv.config({ path: 'config.env' });
 
@@ -22,6 +23,7 @@ app.get('/', (req, res) => {
 app.use(express.json()); // to accept JSON data
 
 app.use('/api/user', userRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
