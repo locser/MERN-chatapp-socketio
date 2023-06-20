@@ -47,8 +47,8 @@ const ProfileModal = ({ user, children }) => {
             <Image
               borderRadius="full"
               boxSize="150px"
-              src="https://bit.ly/dan-abramov"
-              //   src={user.pic}
+              // src="https://bit.ly/dan-abramov"
+              src={user.picture}
               alt={user.name}
             />
             <Text

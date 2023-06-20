@@ -35,22 +35,25 @@ const getAllChatCurrentUser = asyncHandler(async (req, res) => {
 });
 
 const chatToOneUser = asyncHandler(async (req, res) => {
-  const userId = req.user._id; //current user
-  const { otherUserId } = req.body; // lấy id người dùng muốn trò chuyện
+  const currentUser = req.user; //current user
 
-  if (!otherUserId) {
-    return res
-      .status(400)
-      .json({ status: 'error', data: 'otherUserId is required' });
+  const { userId } = req.body; // lấy id người dùng muốn trò chuyện
+
+  if (!userId) {
+    return res.status(400).json({
+      status: 'error',
+      data: 'userId is required',
+    });
   }
 
-  // Kiểm tra xem otherUserId có tồn tại không
-  const otherUser = await User.findById(otherUserId);
+  // Kiểm tra xem userId có tồn tại không
+  const otherUser = await User.findById(userId);
 
   if (!otherUser) {
-    return res
-      .status(400)
-      .json({ status: 'error', data: 'Not found user with ID' });
+    return res.status(400).json({
+      status: 'error',
+      data: 'Invalid User',
+    });
   }
 
   // Kiểm tra xem người dùng cần trò chuyện có tồn tại hay không
@@ -58,9 +61,9 @@ const chatToOneUser = asyncHandler(async (req, res) => {
     isGroupChat: false,
     users: { $all: [currentUser._id, otherUser._id] },
   })
-    // .populate('users', '-pasword')
+    .populate('users', '-pasword')
     // .populate('groupAdmin', '-pasword')
-    .populate('latestMessage')
+    // .populate('latestMessage')
     .sort({ updatedAt: -1 });
 
   if (existingChat) {
@@ -69,17 +72,23 @@ const chatToOneUser = asyncHandler(async (req, res) => {
       status: 'success',
       data: existingChat,
     });
+    console.log('access chat to existing chat', existingChat);
   } else {
     // Tạo chat mới giữa người dùng hiện tại và người dùng khác
     const chatData = {
-      chatName: 'Private Message',
+      chatName: otherUser.name,
       isGroupChat: false,
-      users: [req.user._id, userId],
+      users: [currentUser._id, otherUser._id],
     };
 
     try {
       const createdChat = await Chat.create(chatData);
-      res.status(201).json({ status: 'error', data: createdChat });
+      const FullChat = await Chat.findOne({ _id: createdChat._id }).populate(
+        'users',
+        '-password'
+      );
+      res.status(201).json({ status: 'success', data: FullChat });
+      console.log('access chat to a new chat', FullChat);
     } catch (error) {
       console.log(error);
       res.status(500).json({ status: 'error', data: 'Failed to create chat' });
@@ -89,18 +98,19 @@ const chatToOneUser = asyncHandler(async (req, res) => {
 
 const createGroupChat = asyncHandler(async (req, res) => {
   //check data before creating
-  if (!req.body.users || !req.body.name) {
-    return res
-      .status(404)
-      .json({ status: 'error', data: 'Please add a user to group!' });
+  const { users, name } = req.body;
+  if (!users || !name) {
+    return res.status(404).json({
+      status: 'error',
+      data: 'Please add a user to group!',
+    });
   }
-  // get user in group chat
-  var users = JSON.parse(req.body.users);
 
   if (users.length < 2) {
-    return res
-      .status(404)
-      .json({ status: 'error', data: 'Group chat need more than 2 users!' });
+    return res.status(404).json({
+      status: 'error',
+      data: 'Group chat need more than 2 users!',
+    });
   }
 
   //add current user to group chat
@@ -111,20 +121,24 @@ const createGroupChat = asyncHandler(async (req, res) => {
     const groupChat = await Chat.create({
       chatName: req.body.name, //get from client
       users: users,
-      isGroupChat: true,
-      groupAdmin: req.user,
+      isGroupChat: true, //set group chat
+      groupAdmin: req.user, //set admin user
     });
 
-    const fullGroupChat = await Chat.findOne({ _id: groupChat.id })
-      .populate('users', '-password')
-      .populate('groupAdmin', '-password');
+    const fullGroupChat = await Chat.findOne({ _id: groupChat.id }) //Get Successfully Created Chat
+      .populate('users', '-password');
+    // .populate('groupAdmin', '-password');
 
-    res.status(200).json({ status: 'success', data: fullGroupChat });
+    res.status(200).json({
+      status: 'success',
+      data: fullGroupChat,
+    });
   } catch (error) {
     console.log(error);
-    return res
-      .status(404)
-      .json({ status: 'error', data: 'Fail to create group chat!' });
+    return res.status(404).json({
+      status: 'error',
+      data: 'Fail to create group chat!',
+    });
   }
 });
 
@@ -142,17 +156,20 @@ const renameGroup = asyncHandler(async (req, res) => {
     {
       new: true,
     }
-  )
-    .populate('users', '-password')
-    .populate('groupAdmin', '-password');
+  ).populate('users', '-password');
+  // .populate('groupAdmin', '-password');
 
   if (!updatedChat) {
-    return res
-      .status(404)
-      .json({ status: 'error', data: 'Fail to rename group chat!' });
+    return res.status(404).json({
+      status: 'error',
+      data: 'Fail to rename group chat!',
+    });
     throw new Error('Chat Not Found');
   } else {
-    return res.status(200).json({ status: 'success', data: updatedChat });
+    return res.status(200).json({
+      status: 'success',
+      data: updatedChat,
+    });
   }
 });
 
@@ -172,17 +189,20 @@ const removeFromGroup = asyncHandler(async (req, res) => {
     {
       new: true,
     }
-  )
-    .populate('users', '-password')
-    .populate('groupAdmin', '-password');
+  ).populate('users', '-password');
+  // .populate('groupAdmin', '-password');
 
   if (!removed) {
-    return res
-      .status(404)
-      .json({ status: 'error', data: 'Fail to remove group chat!' });
+    return res.status(404).json({
+      status: 'error',
+      data: 'Fail to remove group chat!',
+    });
     throw new Error('Chat Not Found');
   } else {
-    return res.status(200).json({ status: 'success', data: removed });
+    return res.status(200).json({
+      status: 'success',
+      data: removed,
+    });
   }
 });
 
@@ -202,17 +222,20 @@ const addToGroup = asyncHandler(async (req, res) => {
     {
       new: true,
     }
-  )
-    .populate('users', '-password')
-    .populate('groupAdmin', '-password');
+  ).populate('users', '-password');
+  // .populate('groupAdmin', '-password');
 
   if (!added) {
-    return res
-      .status(404)
-      .json({ status: 'error', data: 'Fail to add user to group chat!' });
+    return res.status(404).json({
+      status: 'error',
+      data: 'Fail to add user to group chat!',
+    });
     throw new Error('Chat Not Found');
   } else {
-    return res.status(200).json({ status: 'success', data: added });
+    return res.status(200).json({
+      status: 'success',
+      data: added,
+    });
   }
 });
 

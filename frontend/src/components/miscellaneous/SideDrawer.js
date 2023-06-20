@@ -10,7 +10,6 @@ import {
   MenuButton,
   MenuDivider,
   MenuItem,
-  MenuItemOption,
   MenuList,
   Spinner,
   Text,
@@ -21,7 +20,6 @@ import {
 import {
   Drawer,
   DrawerBody,
-  DrawerFooter,
   DrawerHeader,
   DrawerOverlay,
   DrawerContent,
@@ -56,14 +54,15 @@ function SideDrawer() {
     setLoading(true);
 
     if (!search) {
+      setLoading(false);
+
       toast({
         title: 'Please Enter something in search',
         status: 'warning',
         duration: 5000,
         isClosable: true,
-        position: 'top-left',
+        position: 'top',
       });
-      setLoading(false);
       return;
     }
 
@@ -73,24 +72,44 @@ function SideDrawer() {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      // FIXME: fix this api
-      // const { data } = await axios.get(`/api/user?search=${search}`, config);
-      // test
-      const data = [
-        { _id: 1, name: 'User 1' },
-        { _id: 2, name: 'User 2' },
-        { _id: 3, name: 'User 3' },
-        { _id: 4, name: 'User 4' },
-        { _id: 5, name: 'User 5' },
-      ];
 
-      setTimeout(() => {
+      const dataJson = await axios.get(`/api/user?search=${search}`, config);
+
+      //get user from dataJson
+      //   {
+      //     "status": "success",
+      //     "length": 1,
+      //     "data": [
+      //         {
+      //             "picture": "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+      //             "_id": "6481ac728c25b34f8b55a8e2",
+      //             "name": "alex",
+      //             "email": "alex@gmail.com",
+      //             "pic": ""
+      //         }
+      //     ]
+      // }
+
+      // console.log(dataJson);
+      const data = dataJson.data.data;
+      // console.log(data);
+      const length = dataJson.data.length;
+      // console.log(length + ' users');
+
+      if (length > 0) {
         setSearchResult(data);
         setLoading(false);
-      }, 3000);
+      } else {
+        setLoading(false);
 
-      // setSearchResult(data);
-      // setLoading(false);
+        toast({
+          title: 'Not found user with keyword',
+          status: 'warning',
+          duration: 5000,
+          isClosable: true,
+          position: 'top',
+        });
+      }
     } catch (error) {
       setLoading(false);
 
@@ -100,13 +119,14 @@ function SideDrawer() {
         status: 'error',
         duration: 5000,
         isClosable: true,
-        position: 'top-left',
+        position: 'top',
       });
     }
   };
 
+  // create chat with selected user
   const accessChat = async (userId) => {
-    console.log(userId);
+    console.log('Chat with user: ' + userId);
     try {
       setLoading(true);
 
@@ -116,24 +136,25 @@ function SideDrawer() {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      // TODO:fix this api
-      const { data } = await axios.post(`/api/chat`, { userId }, config);
+
+      const dataJson = await axios.post(`/api/chat`, { userId }, config);
+
+      const data = dataJson.data.data;
 
       if (!chats.find((c) => c._id === data._id)) setChats([data, ...chats]);
       setSelectedChat(data);
       setLoadingChat(false);
       onClose();
-    } catch (e) {
+    } catch (err) {
       setLoading(false);
-
-      console.error(e);
+      console.error(err);
       toast({
         title: 'Error Occured!',
         description: 'Failed to Access the Chat',
         status: 'error',
         duration: 5000,
         isClosable: true,
-        position: 'top-left',
+        position: 'top',
       });
     }
   };
@@ -199,8 +220,8 @@ function SideDrawer() {
               <Avatar
                 size="sm"
                 cursor="pointer"
-                // name={user.name}
-                // src={user.pic}
+                name={user.name}
+                src={user.picture}
               />
             </MenuButton>
             <MenuList>

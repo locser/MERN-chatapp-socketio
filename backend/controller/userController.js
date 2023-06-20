@@ -3,7 +3,7 @@ const generateToken = require('../config/generateToken');
 const User = require('../models/userModel');
 
 const registerUser = async (req, res) => {
-  const { name, email, password, pic } = req.body;
+  const { name, email, password, picture } = req.body;
 
   if (!name || !email || !password) {
     res.status(400);
@@ -21,7 +21,7 @@ const registerUser = async (req, res) => {
     name: name,
     email: email,
     password: password,
-    pic: pic,
+    picture: picture,
   });
 
   if (user) {
@@ -29,7 +29,7 @@ const registerUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      pic: user.pic,
+      picture: user.picture,
       token: generateToken(user._id),
     });
   } else {
@@ -49,15 +49,38 @@ const authUser = asyncHandler(async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
-      pic: user.pic,
+      picture: user.picture,
       token: generateToken(user._id),
+    });
+  } else {
+    res.status(401).json({
+      status: 'error',
+      message: 'Invalid username or password',
     });
   }
 });
 
 // api/user
 const getAllUsers = asyncHandler(async (req, res) => {
-  const allUser = await User.find();
+  const keyword = req.query.search;
+
+  // console.log(keyword);
+
+  if (!keyword) {
+    res.status(401).json({
+      status: 'error',
+      length: 0,
+      data: [],
+    });
+  }
+  //search and filter users
+
+  const allUser = await User.find({
+    $or: [
+      { name: { $regex: keyword, $options: 'i' } }, // Tìm kiếm tên trùng keyword (không phân biệt hoa/thường)
+      { email: { $regex: keyword, $options: 'i' } }, // Tìm kiếm email trùng keyword (không phân biệt hoa/thường)
+    ],
+  });
 
   res.status(200).json({
     status: 'success',

@@ -9,8 +9,8 @@ router.get('/', protect, chatController.getAllChatCurrentUser);
 router.post('/', protect, chatController.chatToOneUser);
 router.post('/group', protect, chatController.createGroupChat);
 router.route('/rename').put(protect, chatController.renameGroup);
-router.route('/groupremove').put(protect, chatController.removeFromGroup);
-router.route('/groupadd').put(protect, chatController.addToGroup);
+router.route('/group/remove').put(protect, chatController.removeFromGroup);
+router.route('/group/add').put(protect, chatController.addToGroup);
 
 // router.route('/').post(protect, accessChat);
 // router.route('/').get(protect, fetchChats);

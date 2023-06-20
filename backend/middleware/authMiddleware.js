@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const asyncHandler = require('express-async-handler');
-const { promisify } = require('util');
 
 const protect = asyncHandler(async (req, res, next) => {
   let token;
@@ -13,10 +12,7 @@ const protect = asyncHandler(async (req, res, next) => {
       token = req.headers.authorization.split(' ')[1];
 
       //decode token id
-      const decoded = await promisify(jwt.verify)(
-        token,
-        process.env.JWT_SECRET
-      );
+      const decoded = await jwt.verify(token, process.env.JWT_SECRET);
       req.user = await User.findById(decoded.id);
 
       if (!req.user) {

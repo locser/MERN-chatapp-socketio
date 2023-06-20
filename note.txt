@@ -55,3 +55,30 @@
 - npm install cloudinary
 - npm install cors
 - cdn font awesome 5: <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.1/css/all.min.css" integrity="sha512-xA6Hp6oezhjd6LiLZynuukm80f8BoZ3OpcEYaqKoCV3HKQDrYjDE1Gu8ocxgxoXmwmSzM4iqPvCsOkQNiu41GA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+TODO: fix search user.
+
+- Cannot set headers after they are sent to the client
+     Lỗi "Cannot set headers after they are sent to the client" thường xảy ra khi bạn cố gắng thiết lập tiêu đề (headers) sau khi đã gửi phản hồi (response) cho client. Trong trường hợp của bạn, có vẻ như mỗi lần người dùng thay đổi giá trị trong input, bạn lại gọi xử lý hàm và gửi yêu cầu đến API để lấy dữ liệu. Việc này dẫn đến việc gửi nhiều yêu cầu cùng một lúc và gây xung đột trong việc thiết lập tiêu đề.
+
+     Để giải quyết vấn đề này, bạn có thể sử dụng một số kỹ thuật sau:
+
+Debouncing: Sử dụng debounce để chờ một khoảng thời gian nhất định sau khi người dùng thay đổi giá trị trong input trước khi gọi xử lý hàm. Debouncing giúp chỉ gọi xử lý hàm sau khi ngừng nhận thêm yêu cầu trong khoảng thời gian đã định trước.
+
+Throttling: Sử dụng throttling để giới hạn số lượng yêu cầu gửi đến API trong một khoảng thời gian nhất định. Throttling đảm bảo rằng chỉ có một số lượng xác định yêu cầu được gửi đi trong một khoảng thời gian nhất định, ngay cả khi có nhiều yêu cầu được gửi đến.
+
+Caching: Lưu trữ kết quả từ yêu cầu trước đó và sử dụng kết quả đã lưu để trả về cho người dùng mà không cần gửi yêu cầu mới đến API. Điều này giúp giảm số lượng yêu cầu gửi đi và giảm thiểu việc thiết lập tiêu đề lặp lại.
+
+Tùy thuộc vào yêu cầu và môi trường ứng dụng của bạn, bạn có thể lựa chọn kỹ thuật phù hợp để tối ưu hóa yêu cầu và giảm thiểu việc thiết lập tiêu đề quá nhiều lần.
+
+- What is debouncing and throttling TODO:
+    https://www.developerway.com/posts/debouncing-in-react
+
+- TODO: nâng cao 
+:Thay vì gọi hàm handleSearch ngay khi người dùng nhập vào input, bạn có thể sử dụng debounce hoặc throttle để giới hạn số lần gọi hàm. Điều này giúp tránh việc gọi liên tục khi người dùng nhập nhanh, tối ưu hóa hiệu suất.
+
+Sử dụng try-catch block để bắt và xử lý các lỗi trong quá trình gọi API. Bạn đã thực hiện điều này trong mã của bạn, nhưng bạn có thể xem xét thêm việc xử lý các trường hợp lỗi cụ thể và hiển thị thông báo lỗi phù hợp cho người dùng.
+
+Tích hợp chức năng tìm kiếm tự động (autocomplete) khi người dùng nhập vào input. Bạn có thể sử dụng một thư viện autocomplete hoặc triển khai chức năng này bằng cách gửi các yêu cầu tìm kiếm bổ sung khi người dùng nhập.
+
+Xem xét việc tối ưu hóa và tăng tốc độ xử lý của API tìm kiếm để đảm bảo rằng việc truy vấn và trả về kết quả diễn ra một cách nhanh chóng và hiệu quả.
