@@ -139,6 +139,7 @@ export const MyChats = ({ fetchAgain }) => {
                 borderRadius="lg"
                 key={chat._id}
               >
+                {/* FIXME: logout. login Cannot read properties of undefined (reading '_id') */}
                 <Text>
                   {!chat.isGroupChat
                     ? getSender(loggedUser, chat.users)

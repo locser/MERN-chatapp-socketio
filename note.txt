@@ -82,3 +82,15 @@ Sử dụng try-catch block để bắt và xử lý các lỗi trong quá trìn
 Tích hợp chức năng tìm kiếm tự động (autocomplete) khi người dùng nhập vào input. Bạn có thể sử dụng một thư viện autocomplete hoặc triển khai chức năng này bằng cách gửi các yêu cầu tìm kiếm bổ sung khi người dùng nhập.
 
 Xem xét việc tối ưu hóa và tăng tốc độ xử lý của API tìm kiếm để đảm bảo rằng việc truy vấn và trả về kết quả diễn ra một cách nhanh chóng và hiệu quả.
+
+- Đây là trang chính thức của MongoDB về phương thức populate trong Mongoose:
+
+    https://mongoosejs.com/docs/populate.html
+
+    Trang này cung cấp hướng dẫn chi tiết và ví dụ về cách sử dụng populate để nạp thông tin từ các mô hình liên quan trong MongoDB.
+
+    Ngoài ra, đây là một số tài liệu và bài viết khác liên quan đến việc sử dụng populate trong Mongoose:
+
+    https://dev.to/aurelkurtula/introduction-to-mongoose-populate-4lk2
+    https://www.digitalocean.com/community/tutorials/nodejs-mongoose-populate
+    Hy vọng những tài liệu này sẽ giúp bạn hiểu rõ hơn về cách sử dụng populate trong MongoDB và Mongoose.

@@ -1,6 +1,5 @@
 import { useToast } from '@chakra-ui/toast';
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import { Button } from '@chakra-ui/button';
 import {
   Avatar,
@@ -33,6 +32,7 @@ import { UserListItem } from '../userAvatar/UserListItem.js';
 import { ChatLoading } from '../ChatLoading.js';
 import axios from 'axios';
 import { ChatState } from '../../Context/ChatProvider.js';
+import { BrowserRouter, useHistory } from 'react-router-dom';
 
 function SideDrawer() {
   const [search, setSearch] = useState('');
@@ -229,7 +229,9 @@ function SideDrawer() {
                 <MenuItem>My Profile</MenuItem>{' '}
               </ProfileModal>
               <MenuDivider />
-              <MenuItem onClick={logoutHandler}>Logout</MenuItem>
+              <MenuItem onClick={logoutHandler}>
+                <BrowserRouter>Logout</BrowserRouter>
+              </MenuItem>
             </MenuList>
           </Menu>
         </div>
