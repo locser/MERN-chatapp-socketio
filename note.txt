@@ -91,6 +91,8 @@ Xem xét việc tối ưu hóa và tăng tốc độ xử lý của API tìm ki�
 
     Ngoài ra, đây là một số tài liệu và bài viết khác liên quan đến việc sử dụng populate trong Mongoose:
 
-    https://dev.to/aurelkurtula/introduction-to-mongoose-populate-4lk2
-    https://www.digitalocean.com/community/tutorials/nodejs-mongoose-populate
     Hy vọng những tài liệu này sẽ giúp bạn hiểu rõ hơn về cách sử dụng populate trong MongoDB và Mongoose.
+
+- cd .\frontend\
+- npm i  react-scrollable-feed
+- TODO: scrollable-feed

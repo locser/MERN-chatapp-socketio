@@ -1,13 +1,123 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ChatState } from '../Context/ChatProvider';
-import { Box, IconButton, Text } from '@chakra-ui/react';
+import {
+  Box,
+  FormControl,
+  IconButton,
+  Input,
+  Spinner,
+  Text,
+  useToast,
+} from '@chakra-ui/react';
 import { ArrowBackIcon } from '@chakra-ui/icons';
 import { getSender, getSenderFull } from '../config/ChatLogics';
 import ProfileModal from './miscellaneous/ProfileModal';
 import UpdateGroupChatModal from './miscellaneous/UpdateGroupChatModal';
+import axios from 'axios';
+import './styles.css';
+import ScrollableChat from './ScrollableChat';
 
-const SingleChat = ({ fetchAgain, setFetchAgain }) => {
+const SingleChat = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
   const { user, selectedChat, setSelectedChat } = ChatState();
+
+  const [loading, setLoading] = useState(false);
+  const [newMessage, setNewMessage] = useState('');
+
+  const [messages, setMessages] = useState([]);
+  const [typing, setTyping] = useState(false);
+  const [istyping, setIsTyping] = useState(false);
+  const toast = useToast();
+
+  /*
+  route : api/message/:chatId
+*/
+  const getAllMesages = async () => {
+    if (!selectedChat) return;
+
+    try {
+      setLoading(true);
+
+      const config = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      const dataJson = await axios.get(
+        `/api/message/${selectedChat._id}`,
+        config
+      );
+
+      const data = dataJson.data.data;
+      setMessages(data);
+
+      setLoading(false);
+    } catch (e) {
+      console.log('error get all messages: ' + e);
+      toast({
+        title: 'Error Occured!',
+        description: 'Failed to get all message',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+        position: 'top',
+      });
+    }
+  };
+
+  useEffect(() => {
+    console.log('SingleChat-get all message:', messages);
+  }, [messages]);
+
+  useEffect(() => {
+    getAllMesages();
+  }, [selectedChat]);
+
+  const sendMessage = async (event) => {
+    if (event.key === 'Enter' && newMessage) {
+      try {
+        const config = {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${user.token}`,
+          },
+        };
+
+        const dataJson = await axios.post(
+          '/api/message',
+          {
+            content: newMessage,
+            chatId: selectedChat._id,
+          },
+          config
+        );
+
+        const data = dataJson.data.data;
+
+        // delete message in input field
+        setNewMessage('');
+        setMessages([...messages, data]);
+        // [...messages, data] sử dụng cú pháp spread operator (...) để tạo một mảng mới.
+        // Mảng mới này bao gồm tất cả các phần tử từ messages (được sao chép từ mảng hiện tại)
+        // và thêm phần tử data vào cuối mảng.
+        // console.log('SingleChat-send new message' + messages);
+      } catch (error) {
+        console.log('error sending message: ' + error);
+        toast({
+          title: 'Error Occured!',
+          description: 'Failed to send the Message',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+          position: 'top',
+        });
+      }
+    }
+  };
+  const typingHandler = (e) => {
+    setNewMessage(e.target.value);
+  };
 
   return (
     <>
@@ -24,26 +134,30 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             alignItems="center"
           >
             <IconButton
-              display={{ base: 'flex', md: 'none' }}
+              display={{ base: 'flex' }}
               icon={<ArrowBackIcon />}
               onClick={() => setSelectedChat('')}
             />
-            {!selectedChat.isGroupChat ? (
-              <>
-                {getSender(user, selectedChat.users)}
-                <ProfileModal user={getSenderFull(user, selectedChat.users)} />
-              </>
-            ) : (
-              <>
-                {selectedChat.chatName.toUpperCase()}
-                <UpdateGroupChatModal
-                  fetchAgain={fetchAgain}
-                  setFetchAgain={setFetchAgain}
-                  selectedChat={selectedChat}
-                  setSelectedChat={setSelectedChat}
-                />
-              </>
-            )}
+            {messages &&
+              (!selectedChat.isGroupChat ? (
+                <>
+                  {getSender(user, selectedChat.users)}
+                  <ProfileModal
+                    user={getSenderFull(user, selectedChat.users)}
+                  />
+                </>
+              ) : (
+                <>
+                  {selectedChat.chatName.toUpperCase()}
+                  <UpdateGroupChatModal
+                    fetchAgain={fetchAgain}
+                    setFetchAgain={setFetchAgain}
+                    selectedChat={selectedChat}
+                    setSelectedChat={setSelectedChat}
+                    fetchMessages={fetchMessages}
+                  />
+                </>
+              ))}
           </Text>
           <Box
             display="flex"
@@ -56,7 +170,29 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             borderRadius="lg"
             overflowY="hidden"
           >
-            {/* { Message Here */}
+            {loading ? (
+              <Spinner
+                size="xl"
+                w={20}
+                h={20}
+                alignSelf="center"
+                margin="auto"
+              />
+            ) : (
+              <div className="messages">
+                <ScrollableChat messages={messages} />
+              </div>
+            )}
+
+            <FormControl onKeyDown={sendMessage} isRequired mt={3}>
+              <Input
+                variant="filled"
+                bg="#E0E0E0"
+                placeholder="Type a message and Press 'Enter' to send it"
+                value={newMessage}
+                onChange={typingHandler}
+              />
+            </FormControl>
           </Box>
         </>
       ) : (
