@@ -96,3 +96,8 @@ Xem xét việc tối ưu hóa và tăng tốc độ xử lý của API tìm ki�
 - cd .\frontend\
 - npm i  react-scrollable-feed
 - TODO: scrollable-feed
+- npm i socket.io
+- frontend : npm i react-lottie
+    npm i react-lottie -force
+    Bạn có thể sử dụng -force để cài đặt thư viện chưa hỗ trợ ReactJS mới nhất
+- lottie loading typing typing

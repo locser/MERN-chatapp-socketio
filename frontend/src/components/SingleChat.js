@@ -16,6 +16,12 @@ import UpdateGroupChatModal from './miscellaneous/UpdateGroupChatModal';
 import axios from 'axios';
 import './styles.css';
 import ScrollableChat from './ScrollableChat';
+import io from 'socket.io-client';
+import animationData from './../animations/typing.json';
+
+// fix it if u changes port backend
+const ENDPOINT = 'http://localhost:3001';
+var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
   const { user, selectedChat, setSelectedChat } = ChatState();
@@ -26,11 +32,22 @@ const SingleChat = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
   const [messages, setMessages] = useState([]);
   const [typing, setTyping] = useState(false);
   const [istyping, setIsTyping] = useState(false);
+  const [socketConnected, setSocketConnected] = useState(false);
+
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: animationData,
+    rendererSettings: {
+      preserveAspectRatio: 'xMidYMid slice',
+    },
+  };
+
   const toast = useToast();
 
   /*
-  route : api/message/:chatId
-*/
+    route : api/message/:chatId
+  */
   const getAllMesages = async () => {
     if (!selectedChat) return;
 
@@ -53,6 +70,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
       setMessages(data);
 
       setLoading(false);
+
+      socket.emit('join chat', selectedChat._id);
     } catch (e) {
       console.log('error get all messages: ' + e);
       toast({
@@ -66,16 +85,46 @@ const SingleChat = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
     }
   };
 
+  // useEffect(() => {
+  //   console.log('SingleChat-get all message:', messages);
+  // }, [messages]);
+
+  //cẩn thận với các key - value socket
   useEffect(() => {
-    console.log('SingleChat-get all message:', messages);
-  }, [messages]);
+    socket = io(ENDPOINT);
+    socket.emit('setup', user);
+    socket.on('connected', () => {
+      setSocketConnected(true);
+    });
+    socket.on('typing', () => {
+      setIsTyping(true);
+    });
+    socket.on('stop typing', () => {
+      setIsTyping(false);
+    });
+  }, []);
 
   useEffect(() => {
-    getAllMesages();
+    getAllMesages(); // fetch Message
+    selectedChatCompare = selectedChat;
   }, [selectedChat]);
+
+  useEffect(() => {
+    socket.on('message received', (newMessageReceived) => {
+      if (
+        !selectedChatCompare ||
+        selectedChatCompare._id === newMessageReceived.chat._id
+      ) {
+        // give notification
+      } else {
+        setMessages(...messages, newMessageReceived);
+      }
+    });
+  });
 
   const sendMessage = async (event) => {
     if (event.key === 'Enter' && newMessage) {
+      socket.emit('stop typing', selectedChat._id);
       try {
         const config = {
           headers: {
@@ -97,6 +146,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
 
         // delete message in input field
         setNewMessage('');
+
+        //emit to server new message
+        socket.emit('new message', data);
+
         setMessages([...messages, data]);
         // [...messages, data] sử dụng cú pháp spread operator (...) để tạo một mảng mới.
         // Mảng mới này bao gồm tất cả các phần tử từ messages (được sao chép từ mảng hiện tại)
@@ -117,6 +170,28 @@ const SingleChat = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
   };
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
+
+    //Typing Indicator Logic
+    if (!socketConnected) {
+      return;
+    }
+
+    if (!typing) {
+      setTyping(true);
+      socket.emit('typing', selectedChat._id);
+    }
+    let lastTypingTime = new Date().getTime();
+    var timerLength = 3000;
+
+    setTimeout(() => {
+      var timeNow = new Date().getTime();
+      var timeDiff = timeNow - lastTypingTime;
+
+      if (timeDiff >= timerLength && typing) {
+        socket.emit('stop typing', selectedChat._id);
+        setTyping(false);
+      }
+    }, timerLength);
   };
 
   return (
@@ -185,6 +260,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
             )}
 
             <FormControl onKeyDown={sendMessage} isRequired mt={3}>
+              {istyping ? (
+                <div>
+                  {/* <Lottie options={defaultOptions} width={70} /> */}
+                  Someone is Typing...
+                </div>
+              ) : (
+                <></>
+              )}
               <Input
                 variant="filled"
                 bg="#E0E0E0"
