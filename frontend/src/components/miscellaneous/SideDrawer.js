@@ -13,6 +13,7 @@ import {
   Spinner,
   Text,
   Tooltip,
+  effect,
   useDisclosure,
 } from '@chakra-ui/react';
 
@@ -27,22 +28,33 @@ import {
 
 import ProfileModal from './ProfileModal.js';
 import NotificationButton from './NotificationButton.js';
-import { ChevronDownIcon } from '@chakra-ui/icons';
+import { BellIcon, ChevronDownIcon } from '@chakra-ui/icons';
 import { UserListItem } from '../userAvatar/UserListItem.js';
 import { ChatLoading } from '../ChatLoading.js';
 import axios from 'axios';
 import { ChatState } from '../../Context/ChatProvider.js';
 import { BrowserRouter, useHistory } from 'react-router-dom';
+import NotificationBadge from 'react-notification-badge';
+import { getSender } from '../../config/ChatLogics.js';
 
 function SideDrawer() {
   const [search, setSearch] = useState('');
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [loadingChat, setLoadingChat] = useState();
+  const [loadingChat, setLoadingChat] = useState(false);
 
-  const { user, setSelectedChat, chats, setChats } = ChatState();
+  const {
+    user,
+    setSelectedChat,
+    chats,
+    setChats,
+    notification,
+    setNotification,
+  } = ChatState();
+
   const history = useHistory();
   const toast = useToast();
+
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const logoutHandler = () => {
@@ -187,18 +199,21 @@ function SideDrawer() {
         <div>
           <Menu>
             <MenuButton p={1}>
-              {/* <NotificationBadge
-              // count={notification.length}
-              // effect={Effect.SCALE}
+              <NotificationBadge
+                count={notification.length}
+                effect={effect.SCALE}
               />
-              <BellIcon fontSize="2xl" m={1} /> */}
-              {/* FIXME: NotificationBadge peer react 16, my version is 18 */}
-              <NotificationButton />
+              <BellIcon fontSize="2xl" m={1} />
+              {/* FIXME: NotificationBadge peer react 16, my version is 18 
+                u can add --force to install 
+                npm install react-notification-badge --force
+              */}
+              {/* <NotificationButton /> */}
             </MenuButton>
             <MenuList pl={2}>
-              {/* {!notification.length && "No New Messages"}
+              {!notification.length && 'No New Messages'}
               {notification.map((notif) => (
-                <MenuItemOption
+                <MenuItem
                   key={notif._id}
                   onClick={() => {
                     setSelectedChat(notif.chat);
@@ -207,12 +222,9 @@ function SideDrawer() {
                 >
                   {notif.chat.isGroupChat
                     ? `New Message in ${notif.chat.chatName}`
-                    : `New Message from ${getSender(
-                        user,
-                        notif.chat.users
-                      )} efdafada`}
+                    : `New Message from ${getSender(user, notif.chat.users)}`}
                 </MenuItem>
-              ))} */}
+              ))}
             </MenuList>
           </Menu>
           <Menu>

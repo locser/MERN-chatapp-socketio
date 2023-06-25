@@ -18,13 +18,15 @@ import './styles.css';
 import ScrollableChat from './ScrollableChat';
 import io from 'socket.io-client';
 import animationData from './../animations/typing.json';
+import Lottie from 'react-lottie';
 
 // fix it if u changes port backend
 const ENDPOINT = 'http://localhost:3001';
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
-  const { user, selectedChat, setSelectedChat } = ChatState();
+  const { user, selectedChat, setSelectedChat, notification, setNotification } =
+    ChatState();
 
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState('');
@@ -115,9 +117,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
         !selectedChatCompare ||
         selectedChatCompare._id === newMessageReceived.chat._id
       ) {
-        // give notification
+        if (!notification.includes(newMessageReceived)) {
+          // add newMessageReceived to notification existing
+          setNotification([newMessageReceived, ...notification]);
+          setFetchAgain(!fetchAgain); // to get all messages again after
+        }
       } else {
-        setMessages(...messages, newMessageReceived);
+        setMessages([...messages, newMessageReceived]);
       }
     });
   });
@@ -168,6 +174,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
       }
     }
   };
+
   const typingHandler = (e) => {
     setNewMessage(e.target.value);
 
@@ -262,8 +269,12 @@ const SingleChat = ({ fetchAgain, setFetchAgain, fetchMessages }) => {
             <FormControl onKeyDown={sendMessage} isRequired mt={3}>
               {istyping ? (
                 <div>
-                  {/* <Lottie options={defaultOptions} width={70} /> */}
-                  Someone is Typing...
+                  <Lottie
+                    options={defaultOptions}
+                    width={70}
+                    style={{ marginBottom: 15, marginLeft: 0 }}
+                  />
+                  {/* Someone is Typing... */}
                 </div>
               ) : (
                 <></>
