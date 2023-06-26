@@ -185,7 +185,7 @@ function SideDrawer() {
         <Tooltip label="Search Users to chat">
           <Button variant="ghost" onClick={onOpen}>
             <i class="fas fa-search"></i>
-            <Text d={{ base: 'none', md: 'flex' }} px="4">
+            <Text display={{ base: 'none', md: 'flex' }} px="4">
               Search User
             </Text>
           </Button>
@@ -241,9 +241,7 @@ function SideDrawer() {
                 <MenuItem>My Profile</MenuItem>{' '}
               </ProfileModal>
               <MenuDivider />
-              <MenuItem onClick={logoutHandler}>
-                <BrowserRouter>Logout</BrowserRouter>
-              </MenuItem>
+              <MenuItem onClick={logoutHandler}>Logout</MenuItem>
             </MenuList>
           </Menu>
         </div>

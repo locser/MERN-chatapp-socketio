@@ -1,1 +1,9 @@
 node_modules
+
+note.txt
+
+/frontend/node_modules/
+/frontend/build/
+# testing
+/coverage
+/build

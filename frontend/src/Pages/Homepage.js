@@ -6,23 +6,23 @@ import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import Login from '../components/Authentication/Login';
 import { SignUp } from '../components/Authentication/SignUp';
 import { useHistory } from 'react-router';
+// import { ChatState } from '../Context/ChatProvider';
 
 export const Homepage = () => {
   const history = useHistory();
-  const [user, setUser] = useState();
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem('userInfo'));
 
-    if (!user) {
-      // history.push('/');
+    if (user) {
+      history.push('/chats');
     }
   }, [history]);
 
   return (
     <Container maxW="xl" centerContent>
       <Box
-        d="flex"
+        display="flex"
         justifyContent="center"
         p={3}
         bg={'white'}
@@ -31,7 +31,7 @@ export const Homepage = () => {
         borderRadius="lg"
       >
         <Text fontSize="4xl" fontFamily="Work sans" color="black">
-          Talk A Tive
+          Chat with Me
         </Text>
       </Box>
       <Box p={4} bg={'white'} w="100%" borderRadius="lg" color="black">

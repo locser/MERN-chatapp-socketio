@@ -21,7 +21,7 @@ import animationData from './../animations/typing.json';
 import Lottie from 'react-lottie';
 
 // fix it if u changes port backend
-const ENDPOINT = 'http://localhost:3001';
+const ENDPOINT = 'https://mern-chatapp-learn-1d4252460dd2.herokuapp.com/ ';
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain, fetchMessages }) => {

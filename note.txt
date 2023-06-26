@@ -101,3 +101,11 @@ Xem xét việc tối ưu hóa và tăng tốc độ xử lý của API tìm ki�
     npm i react-lottie -force
     Bạn có thể sử dụng -force để cài đặt thư viện chưa hỗ trợ ReactJS mới nhất
 - lottie loading typing typing
+
+--deployment 
+
+- cd .\frontend\ 
+- npm run build
+- install herokucli
+- heroku create 
+https://mern-chatapp-learn-1d4252460dd2.herokuapp.com/ | https://git.heroku.com/mern-chatapp-learn.git

@@ -79,6 +79,11 @@ export const MyChats = ({ fetchAgain }) => {
     fetchAgain được sử dụng trong mảng dependency của useEffect để đảm bảo useEffect được gọi lại khi giá trị của fetchAgain thay đổi. Điều này có thể được sử dụng để kích hoạt useEffect và thực hiện lại các công việc trong trường hợp cần thiết.
    */
   useEffect(() => {
+    /*tạo một đối tượng user mới chỉ chứa các thuộc tính id, name và ảnh
+     từ đối tượng loggedUser, loại bỏ thuộc tính token. 
+     Bạn có thể sử dụng đối tượng user này để lưu vào localStorage
+      hoặc thực hiện các thao tác khác.*/
+    // const { token, ...tempuser } = JSON.parse(localStorage.getItem('userInfo'));
     setLoggedUser(JSON.parse(localStorage.getItem('userInfo')));
     fetchChats();
     // eslint-disable-next-line

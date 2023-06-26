@@ -7,13 +7,14 @@ const cors = require('cors');
 const userRoutes = require('./routes/userRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const messageRoutes = require('./routes/messageRoutes');
+const path = require('path');
 
 dotenv.config({ path: 'config.env' });
 
 const app = express();
 app.use(cors());
 
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.PORT || 3001;
 
 connectDB();
 
@@ -27,11 +28,28 @@ app.use('/api/user', userRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/message', messageRoutes);
 
+// ---------------------Deloyment--------------------
+
+const __dirname1 = path.resolve();
+if (process.env.NODE_ENV !== 'production') {
+  app.use(express.static(path.join(__dirname1, '/frontend/build')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname1, 'frontend', 'buid', 'index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.send('API is running successfully');
+  });
+}
+// --------------------------------
+
 app.use(notFound);
 app.use(errorHandler);
 
 const server = app.listen(
   PORT,
+  // 3001,
   console.log(`server listening on PORT: ${PORT}`.yellow.bold)
 );
 
