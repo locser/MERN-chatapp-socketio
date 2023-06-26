@@ -4,8 +4,9 @@ const messageSchema = mongoose.Schema(
   {
     sender: {
       type: mongoose.Schema.Types.ObjectID,
+      ref: 'User',
     },
-    constent: {
+    content: {
       type: String,
       trim: true,
     },
