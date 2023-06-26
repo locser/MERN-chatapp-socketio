@@ -33,7 +33,7 @@ userSchema.methods.matchPassword = async function (
   enteredPassword,
   userPassword
 ) {
-  console.log(enteredPassword, userPassword);
+  // console.log(enteredPassword, userPassword);
   return await bcrypt.compare(enteredPassword, userPassword);
 };
 
