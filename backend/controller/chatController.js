@@ -243,7 +243,6 @@ const commit1 = {};
 const commit2_amend = {};
 const commit3_amend = {};
 const commit4_amend = {};
-const commit5_amend = {};
 
 module.exports = {
   getAllChatCurrentUser,
