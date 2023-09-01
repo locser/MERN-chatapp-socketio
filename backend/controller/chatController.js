@@ -239,6 +239,8 @@ const addToGroup = asyncHandler(async (req, res) => {
   }
 });
 
+const commit1 = {};
+
 module.exports = {
   getAllChatCurrentUser,
   chatToOneUser,
