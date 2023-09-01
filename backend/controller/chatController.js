@@ -240,6 +240,7 @@ const addToGroup = asyncHandler(async (req, res) => {
 });
 
 const commit1 = {};
+const commit2_amend = {};
 
 module.exports = {
   getAllChatCurrentUser,
